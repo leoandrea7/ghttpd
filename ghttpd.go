@@ -110,11 +110,11 @@ func serveResource(conn net.Conn, path string) {
 
 func validateRequest(method, version string) error {
   if !strings.HasPrefix(version, "HTTP") {
-    return fmt.Errorf("Invalid HTTP version")
+    return fmt.Errorf("invalid HTTP version")
   }
 
   if method != "GET" {
-    return fmt.Errorf("Method not allowed")
+    return fmt.Errorf("method not allowed")
   }
 
   return nil
@@ -135,20 +135,20 @@ func parseRequest(conn net.Conn) (string, string, string, error) {
   firstLine, err := bufio.NewReader(conn).ReadString('\n')
   if err != nil {
     log.Printf("Error: %v", err)
-    return "", "", "", errors.New("Invalid request format")
+    return "", "", "", errors.New("invalid request format")
   }
 
   parts := strings.Split(firstLine, " ")
   if len(parts) != 3 {
     log.Printf("Error: Invalid request")
-    return "", "", "", fmt.Errorf("Invalid Request line")
+    return "", "", "", fmt.Errorf("invalid Request line")
   }
 
   method, rawPath, version := parts[0], parts[1], parts[2]
 
   path, err := url.PathUnescape(rawPath)
   if err != nil {
-    return "", "", "", fmt.Errorf("Invalid URL encoding")
+    return "", "", "", fmt.Errorf("invalid URL encoding")
   }
 
   return method, path, version, nil
