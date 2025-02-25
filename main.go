@@ -1,17 +1,17 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"io"
-	"log"
-	"mime"
-	"net"
-	"net/url"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
+  "bufio"
+  "fmt"
+  "io"
+  "log"
+  "mime"
+  "net"
+  "net/url"
+  "os"
+  "path/filepath"
+  "strings"
+  "time"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
   
   for {
 
-    conn, err :=listener.Accept()
+    conn, err := listener.Accept()
 
     conn.SetDeadline(time.Now().Add(5 * time.Second))
 
@@ -49,51 +49,52 @@ func handleConnection(conn net.Conn) {
   defer conn.Close()
 
   method, path, version, err := parseRequest(conn)
+
   if err != nil {
-		log.Printf("Error parsing request: %v", err)
-		sendError(conn, 400, "Bad Request")
-		return
-	}
+    log.Printf("Error parsing request: %v", err)
+    sendError(conn, 400, "Bad Request")
+    return
+  }
 
   log.Printf("New Request [Method: %s, Path: %s, Version: %s]", method, path, version)
 
   if err := validateRequest(method, version); err != nil {
-		sendError(conn, 400, err.Error())
-		return
-	}
-
+    sendError(conn, 400, err.Error())
+    return
+  }
+  
   serveResource(conn, path)
 }
 
 func serveResource(conn net.Conn, path string) {
-	
+  
   fi, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		sendError(conn, 404, "Not Found")
-		return
-	} else if err != nil {
-		sendError(conn, 500, "Internal Server Error")
-		return
-	}
+  if os.IsNotExist(err) {
+    sendError(conn, 404, "Not Found")
+    return
+  } else if err != nil {
+    sendError(conn, 500, "Internal Server Error")
+    return
+  }
 
-	if fi.IsDir() {
-		generateDirectoryListing(conn, path)
-	} else {
-		sendFile(conn, path)
-	}
+  if fi.IsDir() {
+    generateDirectoryListing(conn, path)
+  } else {
+    sendFile(conn, path)
+  }
 }
 
 
 func validateRequest(method, version string) error {
-	if !strings.HasPrefix(version, "HTTP") {
-		return fmt.Errorf("invalid HTTP version")
-	}
+  if !strings.HasPrefix(version, "HTTP") {
+    return fmt.Errorf("invalid HTTP version")
+  }
 
-	if method != "GET" {
-		return fmt.Errorf("method not allowed")
-	}
+  if method != "GET" {
+    return fmt.Errorf("method not allowed")
+  }
 
-	return nil
+  return nil
 }
 
 // parseRequest reads the first line from the given connection,
@@ -114,7 +115,7 @@ func parseRequest(conn net.Conn) (string, string, string, error) {
 
   if err != nil {
     log.Printf("Error: %v", err)
-		return "", "", "", fmt.Errorf("invalid request format")
+    return "", "", "", fmt.Errorf("invalid request format")
   }
 
   parts := strings.Split(firstLine, " ")
@@ -124,14 +125,14 @@ func parseRequest(conn net.Conn) (string, string, string, error) {
     return "", "", "", fmt.Errorf("invalid URL encoding")
   }
 
-	method, rawPath, version := parts[0], parts[1], parts[2]
+  method, rawPath, version := parts[0], parts[1], parts[2]
 
-	path, err := url.PathUnescape(rawPath)
-	if err != nil {
-		return "", "", "", fmt.Errorf("invalid URL encoding")
-	}
+  path, err := url.PathUnescape(rawPath)
+  if err != nil {
+    return "", "", "", fmt.Errorf("invalid URL encoding")
+  }
 
-	return method, "." + path, version, nil
+  return method, "." + path, version, nil
 }
 
 func sendFile(conn net.Conn, path string) {
@@ -140,7 +141,7 @@ func sendFile(conn net.Conn, path string) {
   file, err := os.Open(path)
 
   if err != nil {
-		sendError(conn, 500, "Internal Server Error")
+    sendError(conn, 500, "Internal Server Error")
     return
   }
 
@@ -150,17 +151,17 @@ func sendFile(conn net.Conn, path string) {
   contentType := mime.TypeByExtension(ext)
 
   if contentType == "" {
-		contentType = "application/octet-stream"
-	}
+    contentType = "application/octet-stream"
+  }
 
   info, err := file.Stat()
-	if err != nil {
-		sendError(conn, 500, "Internal Server Error")
-		return
-	}
+  if err != nil {
+    sendError(conn, 500, "Internal Server Error")
+    return
+  }
   
-	header := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %d\r\n\r\n", contentType, info.Size())
-	conn.Write([]byte(header))
+  header := fmt.Sprintf("HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %d\r\n\r\n", contentType, info.Size())
+  conn.Write([]byte(header))
   io.Copy(conn, file)
 }
 
@@ -187,6 +188,6 @@ func generateDirectoryListing(conn net.Conn, path string) {
 }
 
 func sendError(conn net.Conn, code int, message string) {
-	response := fmt.Sprintf("HTTP/1.1 %d %s\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", code, message, len(message), message)
+  response := fmt.Sprintf("HTTP/1.1 %d %s\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", code, message, len(message), message)
   conn.Write([]byte(response))
 }
