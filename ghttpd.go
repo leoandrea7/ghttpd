@@ -1,38 +1,38 @@
 package main
 
 import (
-	"bufio"
-	"errors"
-	"flag"
-	"fmt"
-	"io"
-	"log"
-	"mime"
-	"net"
-	"net/url"
-	"os"
-	"path/filepath"
-	"runtime"
-	"strings"
-	"time"
+  "bufio"
+  "errors"
+  "flag"
+  "fmt"
+  "io"
+  "log"
+  "mime"
+  "net"
+  "net/url"
+  "os"
+  "path/filepath"
+  "runtime"
+  "strings"
+  "time"
 )
 
 var (
-	port string
-	dir  string
+  port string
+  dir  string
   workers int
 )
 
 func main() {
 
   flag.StringVar(&port, "p", "8080", "Server port")
-	flag.StringVar(&dir, "d", ".", "Directory to serve")
+  flag.StringVar(&dir, "d", ".", "Directory to serve")
   flag.IntVar(&workers, "w", runtime.NumCPU(), "Number of workers")
-	flag.Parse()
+  flag.Parse()
 
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		log.Fatalf("Error: directory %s not exist\n", dir)
-	}
+  if _, err := os.Stat(dir); os.IsNotExist(err) {
+    log.Fatalf("Error: directory %s not exist\n", dir)
+  }
 
   listener, err := net.Listen("tcp", ":"+port)
   if err != nil {
