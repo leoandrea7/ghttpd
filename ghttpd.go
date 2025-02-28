@@ -45,7 +45,7 @@ func main() {
 
   connChan := make(chan net.Conn)
 
-  for i:=0; i< workers; i++ {
+  for i := range workers {
     go func(workerID int) {
       for conn := range connChan {
           log.Printf("Worker %d: handling connection", workerID)
