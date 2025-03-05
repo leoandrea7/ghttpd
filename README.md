@@ -11,6 +11,19 @@ An ultra-lightweight and minimalist HTTP server written in Go, designed to serve
 
 ## Running
 
+### Container
+
+Build image
+```sh
+podman build -t ghttpd:0.0.1 .
+```
+
+Run container
+```sh
+podman run -p 8080:8080 -v ./public:/data:z ghttpd:0.0.1 -d=/data
+```
+
+### No Container
 You need to have [Go](https://go.dev/dl/) installed.
 Run ghttpd server using the following command:
 ```sh
