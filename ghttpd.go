@@ -91,8 +91,8 @@ func handleConnection(conn net.Conn) {
 func serveResource(conn net.Conn, path string) {
 
   fullPath := filepath.Join(dir, path)
+  fileInfo, err := os.Stat(fullPath)
   
-  fi, err := os.Stat(fullPath)
   if os.IsNotExist(err) {
     sendError(conn, 404, "Not Found")
     return
@@ -101,7 +101,7 @@ func serveResource(conn net.Conn, path string) {
     return
   }
 
-  if fi.IsDir() {
+  if fileInfo.IsDir() {
     generateDirectoryListing(conn, path, fullPath)
   } else {
     sendFile(conn, fullPath)
