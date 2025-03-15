@@ -19,7 +19,7 @@ import (
 
 var (
   port string
-  dir  string
+	dir string
   workers int
 )
 
@@ -31,13 +31,12 @@ func main() {
   flag.Parse()
 
   if _, err := os.Stat(dir); os.IsNotExist(err) {
-    log.Fatalf("Error: directory %s not exist\n", dir)
+		log.Fatalf("Error: directory %s does not exist\n", dir)
   }
 
   listener, err := net.Listen("tcp", ":"+port)
   if err != nil {
-    log.Fatalf("Error: %v", err)
-    return
+		log.Fatalf("Error starting server: %v", err)
   }
   defer listener.Close()
 
